@@ -21,6 +21,7 @@ spec:
     metadata:
       labels:
         app: minha-app
+        release: kube-prom-stack
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "8081"
