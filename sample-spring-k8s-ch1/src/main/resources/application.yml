@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: demo
+
+dekorate:
+  kubernetes:
+    port[0]:
+      name: http
+      container-port: 8080
+      host-port: 8080
+    service-type: NodePort
+
+
+logging:
+  structured:
+    format:
+      console: ecs
+
+
+custom:
+  property: ${CUSTOM_PROPERTY:nd}
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - prometheus
+          - metrics
+  endpoint:
+    prometheus:
+      enabled: true
+    health:
+      show-details: ALWAYS
+      #group:
+      #  readiness:
+      #    include: mongo
+      #    additional-path: server:/readiness
+      probes:
+        enabled: true

@@ -1,0 +1,121 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minha-app
+  namespace: default
+  labels:
+    app: minha-app
+    version: "1.0.0"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minha-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: minha-app
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8081"
+        prometheus.io/path: "/actuator/prometheus"
+    spec:
+      containers:
+        - name: minha-app
+          image: localhost:32000/sample-spring-k8s-ch1:1.0.0
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: sample-spring-k8s
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: management
+              containerPort: 8081
+          env:
+            - name: JAVA_OPTS
+              value: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+            - name: SERVER_PORT
+              value: "8080"
+            - name: MANAGEMENT_SERVER_PORT
+              value: "8081"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: management
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: management
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: management
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 20  # aguarda até 100s para startup
+          volumeMounts:
+            - mountPath: /config
+              name: config-volume
+      volumes:
+        - configMap:
+            name: sample-spring-k8s
+          name: config-volume
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minha-app
+  namespace: default
+spec:
+  selector:
+    app: minha-app
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+    - name: management
+      port: 8081
+      targetPort: management
+  type: NodePort
+---
+#apiVersion: v1
+#kind: ConfigMap
+#metadata:
+#  name: sample-spring-k8s
+#data:
+#  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "*"
+#  MANAGEMENT_ENDPOINTS_HEALTH_SHOW_DETAILS: always
+#  MANAGEMENT_ENDPOINTS_HEALTH_PROBES_ENABLED: "true"
+#  CUSTOM_PROPERTY: test
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sample-spring-k8s
+data:
+  application.properties: |
+    management.endpoints.web.exposure.include = *
+    management.endpoints.health.show-details = always
+    management.endpoints.health.probes.enabled = true
+    custom.property = test

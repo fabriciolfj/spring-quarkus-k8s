@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sample-quarkus-k8s
+data:
+  application.properties: |
+    custom.property=test
