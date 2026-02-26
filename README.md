@@ -21,6 +21,10 @@ newgrp microk8s
 
 # Aguardar subir
 microk8s status --wait-ready
+
+mkdir -p ~/.kube
+microk8s config > ~/.kube/config
+
 ```
 
 ### Habilitar addons essenciais
