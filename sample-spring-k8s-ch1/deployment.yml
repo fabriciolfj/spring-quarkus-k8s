@@ -88,6 +88,9 @@ kind: Service
 metadata:
   name: minha-app
   namespace: default
+  labels:
+    app: minha-app
+    release: kube-prom-stack
 spec:
   selector:
     app: minha-app
