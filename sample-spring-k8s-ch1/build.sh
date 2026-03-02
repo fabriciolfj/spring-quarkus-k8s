@@ -6,7 +6,7 @@ docker tag fabricio211/sample-spring-k8s-ch1:1.0.0 localhost:32000/sample-spring
 # push
 docker push localhost:32000/sample-spring-k8s-ch1:1.0.0
 
-kubectl apply -f sample-spring-k8s-ch1/deployment.yml
+kubectl apply -f ./sample-spring-k8s-ch1/deployment.yml
 
 
 

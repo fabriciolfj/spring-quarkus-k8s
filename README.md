@@ -55,6 +55,8 @@ alias helm='microk8s helm3'
 
 ```bash
 microk8s enable prometheus
+
+consultar o nome do seletor  kubectl get prometheus -n observability -o yaml | grep -A 5 "serviceMonitorSelector"
 ```
 
 O addon instala tudo no namespace `observability`:
