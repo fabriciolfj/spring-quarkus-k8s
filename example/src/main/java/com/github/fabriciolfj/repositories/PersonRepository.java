@@ -1,0 +1,19 @@
+package com.github.fabriciolfj.repositories;
+
+import com.github.fabriciolfj.entities.Person;
+import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import jakarta.enterprise.context.ApplicationScoped;
+
+import java.util.List;
+
+@ApplicationScoped
+public class PersonRepository implements PanacheRepository<Person> {
+
+    public List<Person> findByName(final String name) {
+        return find("name", name).list();
+    }
+
+    public List<Person> findByAgeGreaterThan(int age) {
+        return find("age > ?1", age).list();
+    }
+}
